@@ -1,0 +1,14 @@
+---
+title: "R Notebook"
+---
+
+load library
+```{r}
+library(devtools)
+```
+
+gmaxdiff configuration
+```{r}
+use_git()
+```
+
