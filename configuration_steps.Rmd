@@ -12,3 +12,18 @@ gmaxdiff configuration
 use_git()
 ```
 
+user R to make new files
+```{r}
+use_r()
+```
+
+```{r}
+load_all()
+```
+
+```{r}
+library(tidyverse)
+md_define = read_qualtrics_data("sample_data.csv", "inst/extdata/", md_define = NULL)
+View(md_define)
+```
+
