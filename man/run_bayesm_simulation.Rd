@@ -4,7 +4,12 @@
 \alias{run_bayesm_simulation}
 \title{\code{bayesm} wrapper: Run \code{rhierMnlRwMixture} simulation with the parsed format}
 \usage{
-run_bayesm_simulation(md_define = md_define, R = 10000, keep = 10, seed = NULL)
+run_bayesm_simulation(
+  md_define = md_define,
+  R = 10000,
+  keep = 10,
+  seed = NA_integer_
+)
 }
 \arguments{
 \item{md_define}{A list containing a sublist of data}

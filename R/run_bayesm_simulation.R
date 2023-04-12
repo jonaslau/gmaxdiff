@@ -8,10 +8,10 @@
 #' @export
 #' @examples
 #' run_bayesm_simulation(md_define, R = 1e4, keep = 10, seed = NULL)
-run_bayesm_simulation <- function(md_define = md_define, R = 1e4, keep = 10, seed = NULL) {
+run_bayesm_simulation <- function(md_define = md_define, R = 1e4, keep = 10, seed = NA_integer_) {
 
   # set seed
-  current_seed = if_else(!is.null(seed), seed, runif(n = 1, min = 1e4, max = 1e5), NA_real_)
+  current_seed = if_else(!is.na(seed), seed, sample(1e4:1e5, size = 1), NA_integer_)
   set.seed(current_seed)
   message(paste0("seed: ", current_seed))
 
