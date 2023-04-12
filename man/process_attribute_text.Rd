@@ -2,7 +2,7 @@
 % Please edit documentation in R/parse_data.R
 \name{process_attribute_text}
 \alias{process_attribute_text}
-\title{Internal helper function: Format headers of data file}
+\title{Format headers of data file}
 \usage{
 process_attribute_text(md_define = NULL)
 }
@@ -13,5 +13,8 @@ process_attribute_text(md_define = NULL)
 A list containing the data and processed data
 }
 \description{
-Internal helper function: Format headers of data file
+Format headers of data file
+}
+\examples{
+process_attribute_text = function(md_define)
 }
