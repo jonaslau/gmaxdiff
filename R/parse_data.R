@@ -1,7 +1,10 @@
-#' Internal helper function: Format headers of data file
+#' Format headers of data file
 #'
 #' @param md_define A list containing a sublist of data
+#' @export
 #' @returns A list containing the data and processed data
+#' @examples
+#' process_attribute_text = function(md_define)
 process_attribute_text = function(md_define = NULL){
   # check number of attributes at the end
   n_attributes = 0
