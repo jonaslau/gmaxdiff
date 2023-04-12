@@ -9,13 +9,11 @@
 #' @examples
 #' run_bayesm_simulation(md_define, R = 1e4, keep = 10, seed = NULL)
 run_bayesm_simulation <- function(md_define = md_define, R = 1e4, keep = 10, seed = NULL) {
-  # set parameters
-  if (!is.null(seed)) {
-    set.seed(seed)
-  } # 19980904
-  else {
-    set.seed(runif(min = 1e4, max = 1e5))
-  }
+
+  # set seed
+  current_seed = if_else(!is.null(seed), seed, runif(n = 1, min = 1e4, max = 1e5), NA_real_)
+  set.seed(current_seed)
+  message(paste0("seed: ", current_seed))
 
   # retrieve from md_define
   n_shown <- md_define$n$shown
