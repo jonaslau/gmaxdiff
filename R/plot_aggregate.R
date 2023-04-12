@@ -4,7 +4,7 @@
 #' @param burn_in burn in period before the simulated data are used
 #' @returns A list containing the data and processed data
 #' @import ggplot2
-#' @exportcd
+#' @export
 #' @examples
 #' md_define <- read_qualtrics_data("inst/extdata/sample_data.csv")
 #' md_define <- read_qualtrics_header(md_define = md_define)
