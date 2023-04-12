@@ -2,20 +2,22 @@
 % Please edit documentation in R/load_qualtrics.R
 \name{read_qualtrics_data}
 \alias{read_qualtrics_data}
-\title{Add together two numbers}
+\title{Read in a csv file}
 \usage{
 read_qualtrics_data(file_name = NULL, folder = NULL, md_define = NULL)
 }
 \arguments{
-\item{file_name}{A string denoting a csv file, e.g., "abc.csv"}
+\item{file_name}{A string denoting a csv file, e.g., "data.csv"}
 
 \item{folder}{A string denoting the path of where the data file is.}
+
+\item{md_define}{A list containing a sublist of data}
 }
 \value{
-md_define A list containing the data and processed data
+A list containing the data and processed data
 }
 \description{
-Add together two numbers
+Read in a csv file
 }
 \examples{
 read_qualtrics_data(file_name = "data.csv", folder = "/project/", md_define = md_define)

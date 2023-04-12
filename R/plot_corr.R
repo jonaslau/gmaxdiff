@@ -1,14 +1,13 @@
 #' process data to plot attribute correlations
 #'
 #' @param md_define A list containing a sublist of data
+#' @param label_width An integer. Capping label length
+#' @param burn_in burn in period before the simulated data are used
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
 #' plot_corr(md_define)
-process_corr <- function(md_define = NULL) {
-  # burn in period
-  burn_in <- .5
-
+process_corr <- function(md_define = NULL, label_width = 30, burn_in = .5) {
   # retrieve beta weights
   attributes <- md_define$attributes
   dat_estbetas <- md_define$output$bayesm$betadraw
@@ -42,7 +41,7 @@ process_corr <- function(md_define = NULL) {
           "\\d+"
         ))
       ],
-      width = 30
+      width = label_width
     )
   )
 
@@ -63,7 +62,9 @@ plot_corr <- function(md_define = NULL, n_clusters = 1) {
   # google colors
   google_color <- c("#4285F4", "#DB4437", "#F4B400", "#0F9D58")
 
-  corrplot(md_define$results$corrMatrix,
+  dat_corrMatrix <- md_define$results$corrMatrix
+
+  corrplot::corrplot(dat_corrMatrix,
     order = "hclust", # order="hclust", hclust.method = "centroid", addrect = 9,
     addgrid.col = NA,
     bg = element_blank(),

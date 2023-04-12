@@ -1,8 +1,11 @@
 #' Read in a csv file
 #'
+#' @param md_define A list containing a sublist of data
 #' @param file_name A string denoting a csv file, e.g., "data.csv"
 #' @param folder A string denoting the path of where the data file is.
 #' @returns A list containing the data and processed data
+#' @import readr
+#' @import stringr
 #' @export
 #' @examples
 #' read_qualtrics_data(file_name = "data.csv", folder = "/project/", md_define = md_define)
@@ -61,11 +64,14 @@ read_qualtrics_data <- function(file_name = NULL, folder = NULL, md_define = NUL
 #' Process Qualtrics dataset headers
 #'
 #' @param md_define A list containing the data and processed data
+#' @param n_word_match An integer. Number of words match for the maxdiff question
 #' @returns A list containing the data and processed data
 #' @export
+#' @import dplyr
+#' @import forcats
 #' @examples
 #' read_qualtrics_header(md_define = md_define)
-read_qualtrics_header <- function(md_define = NULL) {
+read_qualtrics_header <- function(md_define = NULL, n_word_match = 10) {
   # save to md_define
   if (is.null(md_define)) {
     warning("No data frame to process!")
@@ -76,18 +82,27 @@ read_qualtrics_header <- function(md_define = NULL) {
 
   # extract first X words of the descriptions
   # count number of other variables have the same descriptions
-  n_extractwords <- 10
+  n_extractwords <- n_word_match
   dat_header <- dat_header %>%
     # trim extra spaces
     mutate(describe_extract = str_trim(describe)) %>%
     mutate(describe_extract = str_replace_all(describe_extract, "[:space:]+", " ")) %>%
-    mutate(describe_extract = str_extract(
-      describe_extract,
-      paste0(rep("\\w+", n_extractwords),
-        c(rep("[:space:]", n_extractwords - 1), ""),
-        collapse = ""
-      )
-    ))
+    # mutate(describe_extract = str_extract(
+    #   describe_extract,
+    #   paste0(rep("\\w+", n_extractwords),
+    #     c(rep("[:space:]", n_extractwords - 1), ""),
+    #     collapse = ""
+    #   )
+    # )
+    mutate(describe_extract = str_split_fixed(describe_extract, " - ",2)[,1]) %>%
+    mutate(describe_extract = str_extract_all(describe_extract, "\\w+")
+    )
+
+  dat_header$describe_extract <-
+    lapply(dat_header$describe_extract, function(x){paste0(unlist(x), collapse = "|")})
+  dat_header <- dat_header %>%
+    mutate(describe_extract = str_extract(describe_extract,
+                                          paste0(rep("\\w+", n_extractwords), collapse = "\\|")))
 
   # summarize number of "likely" maxdiff questions
   md_q_describe <- dat_header %>%
@@ -107,7 +122,9 @@ read_qualtrics_header <- function(md_define = NULL) {
 
   # label all maxdiff questions
   dat_header <- dat_header %>%
-    mutate(label = if_else(describe_extract == md_q_describe, "md", "", NA_character_))
+    mutate(label = if_else(str_count(describe_extract, md_q_describe) >
+                             str_count(md_q_describe, "\\|"),
+                           "md", "", NA_character_))
 
   # question text
   question <- dat_header %>%

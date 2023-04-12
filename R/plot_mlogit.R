@@ -2,6 +2,8 @@
 #'
 #' @param md_define A list containing a sublist of data
 #' @returns A list containing the data and processed data
+#' @import mlogit
+#' @import dfidx
 #' @export
 #' @examples
 #' run_mlogit(md_define)
@@ -43,7 +45,7 @@ run_mlogit <- function(md_define) {
 #' Plotting `mlogit` results for checking
 #'
 #' @param md_define A list containing a sublist of data
-#' @param label_with An integer. Capping label length
+#' @param label_width An integer. Capping label length
 #' @param point_color A string denoting the color of the plotted data
 #' @returns A list containing the data and processed data
 #' @export
@@ -97,14 +99,9 @@ plot_mlogit_betas <- function(md_define, label_width = 30, point_color = NULL) {
       name = "",
       breaks = paste0("a__", 1:n_attributes),
       labels = str_trim(
-        str_replace(
           str_trunc(
             dat_attribute,
-            width = label_width, ellipsis = ""
-          ),
-          "\\W+$|[:space:]\\w+$", "..."
-        ),
-      )
+            width = label_width, ellipsis = "..."))
     ) +
     scale_y_continuous(
       name = "Aggregate beta weights",
@@ -116,9 +113,9 @@ plot_mlogit_betas <- function(md_define, label_width = 30, point_color = NULL) {
       # labels = function(x){x*100},
       expand = c(0, 0)
     )
-  print(fig)
 
   # save output
+  print(fig)
   md_define$plots$mlogit_betas <- fig
 
   return(md_define)

@@ -1,11 +1,13 @@
 #' Count plot
 #'
 #' @param md_define A list containing a sublist of data
+#' @param label_width maximum width of text labels
 #' @returns A list containing the data and processed data
 #' @export
+#' @import cowplot
 #' @examples
 #' plot_aggregate_betas(md_define)
-plot_count <- function(md_define = NULL) {
+plot_count <- function(md_define = NULL, label_width = 30) {
   # save to md_define
   if (is.null(md_define)) {
     warning("No data frame to process! ")
@@ -20,8 +22,6 @@ plot_count <- function(md_define = NULL) {
   n_attributes <- md_define$n$attributes
   dat_attribute <- md_define$attributes
   n_shown <- md_define$n$shown
-
-  label_width <- 30
 
   dat_appear <- dat_mdformat %>%
     mutate(attribute = as.integer(attribute)) %>%
@@ -109,14 +109,9 @@ plot_count <- function(md_define = NULL) {
       name = NULL,
       breaks = paste0(1:n_attributes),
       labels = str_trim(
-        str_replace(
-          str_trunc(
-            dat_attribute,
-            width = label_width, ellipsis = ""
-          ),
-          "\\W+$|[:space:]\\w+$", "..."
-        ),
-      )
+        str_trunc(
+          dat_attribute,
+          width = label_width, ellipsis = "..."))
     ) +
     scale_y_continuous(
       name = "Difference (%)",
@@ -189,9 +184,8 @@ plot_count <- function(md_define = NULL) {
 
   fig <- plot_grid(fig1, fig2, rel_widths = c(1.2, 1), align = "h")
 
-  print(fig)
-
   # save to data
+  print(fig)
   md_define$plots$count <- fig
 
   # return object

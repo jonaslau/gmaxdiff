@@ -2,18 +2,16 @@
 #'
 #' @param md_define A list containing a sublist of data
 #' @param group_var A string denoting the variable in the data set header
+#' @param burn_in burn in period before the simulated data are used
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
 #' process_group_prct(md_define, group_var = "Q4")
-process_group_prct <- function(md_define = NULL, group_var = NULL) {
+process_group_prct <- function(md_define = NULL, group_var = NULL, burn_in = .5) {
   # save to md_define
   if (is.null(md_define)) {
     warning("No data frame to process! ")
   }
-
-  # burn in period
-  burn_in <- .5
 
   # retrieve beta weights
   dat <- md_define$data$raw
@@ -115,7 +113,7 @@ process_group_prct <- function(md_define = NULL, group_var = NULL) {
 #' Group plot and save data
 #'
 #' @param md_define A list containing a sublist of data
-#' @param label_with An integer. Capping label length
+#' @param label_width maximum width of text labels
 #' @param include The groups to include. Must match exact wording in data.
 #' @returns A list containing the data and processed data
 #' @export
@@ -132,8 +130,11 @@ plot_group_prct <- function(md_define, label_width = 30, include = NULL) {
   n_attributes <- md_define$n$attributes
 
   # exclude groups if any
-  dat_plot_group <- dat_plot_group %>%
-    filter(group %in% include)
+  if(!is.null(include)){
+    dat_plot_group <- dat_plot_group %>%
+      filter(group %in% include)
+  }
+
 
   # aggregate
   dat_plot <- md_define$results$aggregate_prct
@@ -202,14 +203,9 @@ plot_group_prct <- function(md_define, label_width = 30, include = NULL) {
       name = "",
       breaks = paste0("a__", 1:n_attributes),
       labels = str_trim(
-        str_replace(
-          str_trunc(
-            dat_attribute,
-            width = label_width, ellipsis = ""
-          ),
-          "\\W+$|[:space:]\\w+$", "..."
-        ),
-      )
+        str_trunc(
+          dat_attribute,
+          width = label_width, ellipsis = "..."))
     ) +
     scale_y_continuous(
       name = "Percentage Share (%)",
@@ -255,6 +251,8 @@ plot_group_prct <- function(md_define, label_width = 30, include = NULL) {
   }
 
   # save data
+  print(fig)
   md_define$plots$group_prct <- fig
+
   return(md_define)
 }

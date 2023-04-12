@@ -1,9 +1,47 @@
-#' Check incomplete response per respondent
+#' Internal helper function: Format headers of data file
 #'
 #' @param md_define A list containing a sublist of data
 #' @returns A list containing the data and processed data
-#' @examples
-#' check_response_number(md_define, signchange = FALSE)
+process_attribute_text = function(md_define = NULL){
+  # check number of attributes at the end
+  n_attributes = 0
+
+  # check md_define
+  if(is.null(md_define) | is.null(md_define$data$header)){
+    warning("No data frame to process!")
+  }
+
+  # retrieve info for process
+  dat_header = md_define$data$header
+  n_attributes = md_define$n$attributes
+
+  # clean up the raw data header
+  dat = md_define$data$raw
+
+  # for merger header
+  dat_header_merger = tibble(
+    name_old = names(dat)
+  )
+  dat_header_merger = dat_header_merger %>%
+    left_join(dat_header %>% select(name_old = name, name_new),
+              by = "name_old")
+  # replace names of maxdiff columns with
+  # (digit)_md_(digit) format
+  # cooresponds to loop, md_identifier, attribute
+  names(dat) = if_else(!is.na(dat_header_merger$name_new),
+                       dat_header_merger$name_new, names(dat), NA_character_)
+
+  # save to data
+  md_define$data$raw = dat
+
+  # return object
+  return(md_define)
+}
+
+#' Internal helper function: Check incomplete response per respondent
+#'
+#' @param md_define A list containing a sublist of data
+#' @returns A list containing the data and processed data
 check_response_number <- function(md_define = NULL) {
   # save to md_define
   if (is.null(md_define)) {
@@ -69,12 +107,10 @@ check_response_number <- function(md_define = NULL) {
   return(md_define)
 }
 
-#' Check if there attribute coding matches
+#' Internal helper function: Check if there attribute coding matches
 #'
 #' @param md_define A list containing a sublist of data
 #' @returns NULL. Throws a warning if not matched
-#' @examples
-#' check_displaymatrix(md_define, signchange = FALSE)
 check_displaymatrix <- function(md_define = NULL) {
   # save to md_define
   if (is.null(md_define)) {
@@ -127,6 +163,7 @@ check_displaymatrix <- function(md_define = NULL) {
 #' @param md_define A list containing a sublist of data
 #' @param signchange Boolean, whether the scale should flip. Default: FALSE
 #' @returns A list containing the data and processed data
+#' @import tidyr
 #' @export
 #' @examples
 #' process_maxdiff_format(md_define, signchange = FALSE)
@@ -275,6 +312,7 @@ process_maxdiff_module_format <- function(md_define = NULL, signchange = FALSE) 
 
   # load data from md_define for processing
   dat <- md_define$data$raw
+  dat_header <- md_define$data$header
 
   # response
   dat_md_resp <- dat %>%
@@ -378,14 +416,19 @@ process_maxdiff_module_format <- function(md_define = NULL, signchange = FALSE) 
   # fill in the NA values
   dat_md[is.na(dat_md)] <- 0
 
+  # question
+  question = dat_header$describe[which(dat_header$name == "C1_1")]
+  question = str_replace_all(question, "\\[Field-\\d+\\.\\d+_MAXDIFF\\]", "")
+
   # save to data
   md_define$data$maxdiff <- dat_md
   md_define$n$shown <- max(as.integer(dat_md$choice_order))
   md_define$n$attributes <- length(dat_attribute)
   md_define$n$trials <- max(dat_md$trial)
-  md_define$n$participants <- length(unique(dat_md$ResponseId))
+  md_define$n$respondents <- length(unique(dat_md$ResponseId))
   md_define$attributes <- dat_attribute
   md_define$polarity_code <- polarity_code
+  md_define$question <- question
 
   # return object
   return(md_define)

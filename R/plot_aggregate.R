@@ -1,18 +1,23 @@
 #' process aggregate betas
 #'
 #' @param md_define A list containing a sublist of data
+#' @param burn_in burn in period before the simulated data are used
 #' @returns A list containing the data and processed data
-#' @export
+#' @import ggplot2
+#' @exportcd
 #' @examples
-#' process_aggregate_betas(md_define)
-process_aggregate_betas <- function(md_define = NULL) {
+#' md_define <- read_qualtrics_data("inst/extdata/sample_data.csv")
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+#' md_define <- process_bayesm_format(md_define = md_define)
+#' md_define <- run_bayesm_simulation(md_define, R = 2e3)
+#' md_define <- process_aggregate_betas(md_define = md_define)
+process_aggregate_betas <- function(md_define, burn_in = .5) {
   # save to md_define
   if (is.null(md_define)) {
     warning("No data frame to process! ")
   }
-
-  # burn in period
-  burn_in <- .5
 
   # retrieve data
   n_attributes <- md_define$n$attributes
@@ -52,13 +57,13 @@ process_aggregate_betas <- function(md_define = NULL) {
 #' Aggregate plot and save data
 #'
 #' @param md_define A list containing a sublist of data
-#' @param label_with An integer. Capping label length
+#' @param label_width An integer. Capping label length
 #' @param point_color A string denoting the color of the plotted data
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' plot_aggregate_betas(md_define, label_width = 30, include = c("Female", "Male", "Unspecified"))
-plot_aggregate_betas <- function(md_define, label_width = 30, point_color = NULL) {
+#' plot_aggregate_betas(md_define, label_width = 30)
+plot_aggregate_betas <- function(md_define = NULL, label_width = 30, point_color = NULL) {
   google_color <- c("#4285F4", "#DB4437", "#F4B400", "#0F9D58")
 
   # check input arguments
@@ -98,14 +103,9 @@ plot_aggregate_betas <- function(md_define, label_width = 30, point_color = NULL
       name = "",
       breaks = paste0("a__", 1:n_attributes),
       labels = str_trim(
-        str_replace(
-          str_trunc(
-            dat_attribute,
-            width = label_width, ellipsis = ""
-          ),
-          "\\W+$|[:space:]\\w+$", "..."
-        ),
-      )
+        str_trunc(
+          dat_attribute,
+          width = label_width, ellipsis = "..."))
     ) +
     scale_y_continuous(
       name = "Aggregate beta weights",
@@ -119,25 +119,25 @@ plot_aggregate_betas <- function(md_define, label_width = 30, point_color = NULL
     )
 
   # save output
+  print(fig)
   md_define$plots$aggregate_betas <- fig
+
   return(md_define)
 }
 
 #' Post simulation analysis: Percentage
 #'
 #' @param md_define A list containing a sublist of data
+#' @param burn_in burn in period before the simulated data are used
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
 #' process_aggregate_prct(md_define)
-process_aggregate_prct <- function(md_define = NULL) {
+process_aggregate_prct <- function(md_define = NULL, burn_in = .5) {
   # save to md_define
   if (is.null(md_define)) {
     warning("No data frame to process! ")
   }
-
-  # burn in period
-  burn_in <- .5
 
   # retrieve data
   n_attributes <- md_define$n$attributes
@@ -177,13 +177,13 @@ process_aggregate_prct <- function(md_define = NULL) {
 #' Aggregate plot and save data
 #'
 #' @param md_define A list containing a sublist of data
-#' @param label_with An integer. Capping label length
+#' @param label_width An integer. Capping label length
 #' @param point_color A string denoting the color of the plotted data
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' plot_aggregate_betas(md_define, label_width = 30, include = c("Female", "Male", "Unspecified"))
-plot_aggregate_prct <- function(md_define, label_width = 30, point_color = NULL) {
+#' plot_aggregate_prct(md_define, label_width = 30)
+plot_aggregate_prct <- function(md_define = NULL, label_width = 30, point_color = NULL) {
   google_color <- c("#4285F4", "#DB4437", "#F4B400", "#0F9D58")
 
   # check input arguments
@@ -228,14 +228,9 @@ plot_aggregate_prct <- function(md_define, label_width = 30, point_color = NULL)
       name = "",
       breaks = paste0("a__", 1:n_attributes),
       labels = str_trim(
-        str_replace(
-          str_trunc(
-            dat_attribute,
-            width = label_width, ellipsis = ""
-          ),
-          "\\W+$|[:space:]\\w+$", "..."
-        ),
-      )
+        str_trunc(
+          dat_attribute,
+          width = label_width, ellipsis = "..."))
     ) +
     scale_y_continuous(
       name = "Percentage Share (%)",
@@ -248,6 +243,8 @@ plot_aggregate_prct <- function(md_define, label_width = 30, point_color = NULL)
     )
 
   # save output
+  print(fig)
   md_define$plots$aggregate_prct <- fig
+
   return(md_define)
 }

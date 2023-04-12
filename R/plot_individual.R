@@ -1,18 +1,16 @@
 #' Individual estimation
 #'
 #' @param md_define A list containing a sublist of data
+#' @param burn_in burn in period before the simulated data are used
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
 #' plot_individual_prct(md_define)
-process_individual_prct <- function(md_define = NULL) {
+process_individual_prct <- function(md_define = NULL, burn_in = .5) {
   # save to md_define
   if (is.null(md_define)) {
     warning("No data frame to process! ")
   }
-
-  # burn in period
-  burn_in <- .5
 
   # retrieve beta weights
   dat_estbetas <- md_define$output$bayesm$betadraw
@@ -51,7 +49,7 @@ process_individual_prct <- function(md_define = NULL) {
 #' Plot individual distribution
 #'
 #' @param md_define A list containing a sublist of data
-#' @param label_with An integer. Capping label length
+#' @param label_width An integer. Capping label length
 #' @param ncol Number of column in the plots
 #' @returns A list containing the data and processed data
 #' @export
@@ -78,13 +76,10 @@ plot_attribute_distribution <- function(md_define, label_width = 30, ncol = 2) {
   dat_plot <- dat_plot %>%
     mutate(attribute = as.integer(str_replace(attribute, "a__", "")))
 
-  strip_label <- str_trim(str_replace(
-    str_trunc(
-      dat_attribute,
-      width = label_width, ellipsis = "<trunc>"
-    ),
-    "([:space:]\\w+)<trunc>$|([:space:])<trunc>$", "..."
-  ))
+  strip_label <- str_trim(
+      str_trunc(
+        dat_attribute,
+        width = label_width, ellipsis = "..."))
   names(strip_label) <- paste0("a__", 1:n_attributes)
 
   fig <- vector("list", ceiling(n_attributes / 6))
@@ -115,7 +110,8 @@ plot_attribute_distribution <- function(md_define, label_width = 30, ncol = 2) {
             x * 100
           }
         ) +
-        facet_wrap(vars(attribute), scales = "free_y", ncol = 2, nrow = 3, labeller = labeller(attribute = strip_label)) +
+        facet_wrap(vars(attribute), scales = "free_y", ncol = 2, nrow = 3,
+                   labeller = labeller(attribute = strip_label)) +
         geom_vline(xintercept = 1 / n_attributes, color = google_color[1], linetype = 2) +
         theme_minimal() +
         theme(
@@ -128,6 +124,8 @@ plot_attribute_distribution <- function(md_define, label_width = 30, ncol = 2) {
   }
 
   # save data
+  print(fig)
   md_define$plots$individual_distribution <- fig
+
   return(md_define)
 }

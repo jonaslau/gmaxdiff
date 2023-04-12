@@ -3,13 +3,14 @@
 #' @param md_define A list containing a sublist of data
 #' @param R An integer. Number of MCMC draws
 #' @param keep An integer. Keeping every `keep`-th draw. Default: keeping 2000 draws.
+#' @param seed An integer. Provide a seed for results reproduction
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' run_bayesm_simulation(md_define, signchange = FALSE, R = 1e4, keep = 10, seed = NULL)
-run_bayesm_simulation <- function(md_define = md_define, R = 1e4, keep = NULL, seed = NULL) {
+#' run_bayesm_simulation(md_define, R = 1e4, keep = 10, seed = NULL)
+run_bayesm_simulation <- function(md_define = md_define, R = 1e4, keep = 10, seed = NULL) {
   # set parameters
-  if (is.null(seed)) {
+  if (!is.null(seed)) {
     set.seed(seed)
   } # 19980904
   else {
@@ -24,17 +25,15 @@ run_bayesm_simulation <- function(md_define = md_define, R = 1e4, keep = NULL, s
   ncomp <- 1
   a <- rep(1, ncomp)
   # R   <- 1e4 # control by wrapper parameter
-  keep <- if_else(is.null(keep),
-    max(c(floor(R / 2e3), 1)), keep, NA_real_
-  ) # keeping every X-th of R to make up 2000 samples
+  keep_feed_to_bayesm <- min(keep, max(c(floor(R / 2e3), 1L))) # keeping every X-th of R to make up 2000 samples
 
   data <- list(lgtdata = md_define$data$bayesm, p = n_shown)
   prior <- list(ncomp = ncomp)
-  mcmc <- list(R = R, nprint = 1e3, keep = keep)
+  mcmc <- list(R = R, nprint = 1e3, keep = keep_feed_to_bayesm)
 
   # load output
   # run the analysis
-  bayesm.output <- rhierMnlRwMixture(Data = data, Prior = prior, Mcmc = mcmc)
+  bayesm.output <- bayesm::rhierMnlRwMixture(Data = data, Prior = prior, Mcmc = mcmc)
 
   # save to data
   md_define$output$bayesm <- bayesm.output
@@ -46,11 +45,12 @@ run_bayesm_simulation <- function(md_define = md_define, R = 1e4, keep = NULL, s
 #' Making trace plot for the MCMC draws
 #'
 #' @param md_define A list containing a sublist of data
+#' @param label_width An integer. Capping label length
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
 #' plot_trace(md_define)
-plot_trace <- function(md_define = NULL) {
+plot_trace <- function(md_define = NULL, label_width = 30) {
   # save to md_define
   if (is.null(md_define)) {
     warning("No data frame to process! ")
@@ -59,7 +59,7 @@ plot_trace <- function(md_define = NULL) {
   # load data from md_define for processing
   dat_bayesm_compdraw <- md_define$output$bayesm$nmix$compdraw
   n_attributes <- md_define$n$attributes
-  attributes <- md_define$attributes
+  dat_attribute <- md_define$attributes
 
   # looping over the iterations
   dat_compdraw <- NULL
@@ -86,9 +86,10 @@ plot_trace <- function(md_define = NULL) {
     scale_color_discrete(
       name = NULL,
       breaks = paste0("V", 1:(n_attributes - 1)),
-      labels = str_trunc(attributes[1:(n_attributes - 1)],
-        width = 20
-      )
+      labels = str_trim(
+        str_trunc(
+          dat_attribute[1:(n_attributes - 1)],
+          width = label_width, ellipsis = "..."))
     ) +
     theme_bw() +
     theme(
@@ -99,6 +100,7 @@ plot_trace <- function(md_define = NULL) {
     ))
 
   # save to data
+  print(fig)
   md_define$plots$trace <- fig
 
   # return object
