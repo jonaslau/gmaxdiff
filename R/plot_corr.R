@@ -74,7 +74,7 @@ plot_corr <- function(md_define = NULL, n_clusters = 1) {
     ),
     # col = colorRampPalette(c(google_color[2], google_color[1]))( 10 ),
     hclust.method = c("ward.D"),
-    tl.col = "grey25", tl.cex = 0.8,
+    tl.col = "grey25", tl.cex = 0.6,
     # tl.pos="ld",
     tl.srt = 90, tl.offset = .5,
     addrect = n_clusters, # If order = "hclust", number of cluster rectangles

@@ -78,7 +78,7 @@ plot_trace <- function(md_define = NULL, label_width = 30) {
   (fig <- dat_compdraw %>%
     ggplot(aes(x = iteration, y = beta, color = variable)) +
     # geom_point() +
-    geom_line(alpha = .5) +
+    geom_line(alpha = .2) +
     scale_x_continuous(name = "Iterations after thinning", expand = c(0, 0)) +
     ylab("Average beta coefficients") +
     scale_color_discrete(
@@ -94,7 +94,8 @@ plot_trace <- function(md_define = NULL, label_width = 30) {
       panel.grid = element_blank(),
       panel.border = element_rect(color = "grey90"),
       panel.background = element_blank(),
-      plot.background = element_blank()
+      plot.background = element_blank(),
+      legend.text = element_text(size = 7)
     ))
 
   # save to data

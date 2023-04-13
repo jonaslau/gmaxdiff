@@ -139,7 +139,7 @@ plot_count <- function(md_define = NULL, label_width = 30) {
     #               color = "grey75", position = pd) +
     geom_point(size = 3) + # , position = pd
     coord_flip() +
-    # geom_hline(yintercept = 0, color = google_color[1], linetype = 2) +
+    geom_hline(yintercept = 1/n_shown, color = google_color[1], linetype = 2) +
     theme_bw() +
     theme(
       panel.grid = element_blank(),
@@ -150,6 +150,7 @@ plot_count <- function(md_define = NULL, label_width = 30) {
       legend.key = element_blank(),
       # legend.justification = c(.99, .5),
       legend.position = "right",
+      legend.text = element_text(size = 8),
       strip.background = element_blank(),
       axis.text.y = element_blank()
     ) +
