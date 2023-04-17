@@ -1,0 +1,179 @@
+---
+title: "Icecream Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Icecream Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(gmaxdiff)
+```
+
+## The analysis begins: 
+## Step 1. Load data file
+Note on Qualtrics data:  
+- MaxDiff Question format with question order 
+- MaxDiff Module format with question order
+- The exported csv can be either "text" or "numeric" output, but "text" output makes your life easier
+- `Export viewing order data for randomized surveys` should be selected while exporting data file from Qualtrics
+- Here we import the simulated ice cream data set as illustration
+```{r}
+library(tidyverse)
+file_path <- system.file("extdata", "sample_data.csv", package = "gmaxdiff")
+md_define <- read_qualtrics_data(file_path)
+```
+
+## Steps 2. Process the header
+```{r, message=FALSE}
+# if your survey is in `MaxDiff Question` format
+# read header
+md_define <- md_define %>%
+  read_qualtrics_header()
+
+# process header text
+md_define <- md_define %>%
+  process_attribute_text()
+
+# process maxdiff questions
+# i.e., replace the question number for further processing
+md_define <- md_define %>%
+  process_maxdiff_question_format(signchange = FALSE)
+
+# if your survey is in `MaxDiff Module` format
+# run the following line instead of the three above
+if (FALSE){
+  md_define <- md_define %>%
+    process_maxdiff_module_format(signchange = FALSE)
+}
+```
+
+## Step 3. Check data parsing output
+If needed, switch polarity by changing `signchange` argument in Step 2. 
+```{r}
+message("Summary of your data set:")
+message("----------------------------------------")
+message("Question:", md_define$question, sep = "\t\t\t")
+message("Polarity: ",
+        paste0("Negative: ", md_define$polarity_code[1], "; ",
+               "Positive: ", md_define$polarity_code[2]))
+message("Number of respondents: ", md_define$n$respondents)
+message("Total number of atributes: ", md_define$n$attributes)
+message("Number of trials: ", md_define$n$trials)
+message("Number of atributes per trial: ", md_define$n$shown)
+message("----------------------------------------")
+```
+
+## Step 4. Count analysis (optional)
+MaxDiff doesn't have to be run with hierarchical bayes models technically. 
+Simple counting can be powerful, but it should be used as reference only. 
+```{r}
+# running the analysis & plotting
+md_define <- md_define %>%
+  plot_count(label_width = 30)
+```
+
+## Step 5. Multinomial Logistic Regression analysis (optional)
+mlogit assumes all responses come from the same respondent. 
+It is apparently a very strong assumption, and therefore should be treated as reference only. 
+The output is `beta weights`, which are not really interpretable. 
+```{r}
+# running the analysis
+md_define <- md_define %>%
+  run_mlogit()
+
+# plotting the results
+md_define <- md_define %>%
+  plot_mlogit_betas()
+```
+
+## Step 6. Run `bayesm` modeling
+This process can take 5 to 30 minutes, depending on:  
+- data size (number of respondents, number of trials, etc)
+- number of iterations `R`: in general, >2e4 is needed for production-level analysis
+- `R` can be set to ~500 for testing
+Check the output and see if the simulations are stable
+```{r}
+# create some new data frame to fit the `bayesm` format
+md_define <- md_define %>%
+  process_bayesm_format()
+
+# run the analysis with `bayesm` package with default parameters
+md_define <- md_define %>%
+  run_bayesm_simulation(R = 5e2, seed = NA_integer_)
+
+# plot the `trace plot` for visual analysis
+md_define <- md_define %>%
+  plot_trace()
+```
+
+# Step 6.1.1 Plotting aggregate results
+The outputs can be `percentage share` or `beta weights`
+- `beta weights` are extremely hard to interpret
+- The negative ends of `beta weights` output are over-represented, and are misleading
+- The 0 point is an arbitrary reference (last item on the list)
+- But it is your own choice to decide between `percentage share` and `beta weights`
+```{r}
+# running the analysis
+md_define <- md_define %>%
+  process_aggregate_betas()
+
+# plotting the results
+md_define <- md_define %>%
+  plot_aggregate_betas(label_width = 20)
+``` 
+
+# Step 6.1.2 Plotting aggregate results in `percentage share`
+- The vertical line denotes the change level. Only attributes above the chance line are worth considering
+```{r}
+# running the analysis
+md_define <- md_define %>%
+  process_aggregate_prct()
+
+# plotting the results
+md_define <- md_define %>%
+  plot_aggregate_prct(label_width = 20)
+```
+
+# Step 6.2 Individual attribute distribution
+Most attributes should have a distribution below (to the left of) the chance line
+```{r}
+# running the analysis
+md_define <- md_define %>%
+  process_individual_prct()
+
+# plotting the results
+md_define <- md_define %>%
+  plot_attribute_distribution(label_width = 20)
+```
+
+# Step 6.3 Correlation between attributes
+- Use `n_clusters` argument to adjust the number of clusters you'd like to see
+```{r}
+# running the analysis
+md_define <- md_define %>%
+  process_corr(label_width = 20)
+
+# plotting the results
+plot_corr(md_define, n_clusters = 3)
+```
+
+# Step 6.4 Respondent group analysis
+- `group_var` is the variable name in the raw data
+```{r}
+# running the analysis
+md_define <- md_define %>%
+  process_group_prct(group_var = "Q18")
+
+# plotting the results
+md_define <- md_define %>%
+  plot_group_prct(label_width = 30)
+```
