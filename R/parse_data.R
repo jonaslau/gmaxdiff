@@ -54,6 +54,7 @@ check_response_number <- function(md_define = NULL) {
   # retrieve data for process
   dat <- md_define$data$raw
   dat_maxdiff <- md_define$data$maxdiff
+  polarity_code <- md_define$polarity_code
 
   # read data from md_define for processing
   n_trials <- md_define$n$trials
@@ -72,7 +73,14 @@ check_response_number <- function(md_define = NULL) {
   dat_respondents <- dat_respondents %>%
     filter(option != "DO") %>%
     group_by(ResponseId) %>%
-    count(response) %>%
+    count(response)
+
+  dat_respondents$response <- type.convert(dat_respondents$response, as.is = TRUE)
+  if(is.character(dat_respondents$response)){
+    dat_respondents <- dat_respondents %>%
+      mutate(response = factor(response, polarity_code, 1:2))
+  }
+  dat_respondents <- dat_respondents %>%
     pivot_wider(
       id_cols = ResponseId,
       names_from = response,
@@ -122,6 +130,7 @@ check_displaymatrix <- function(md_define = NULL) {
 
   # load data from md_define for processing
   n_attributes <- md_define$n$attributes
+  dat_attribute <- md_define$attribute
   n_shown <- md_define$n$shown
   dat <- md_define$data$raw
 
@@ -142,7 +151,7 @@ check_displaymatrix <- function(md_define = NULL) {
 
   # check if length of option codes are consistent
   dat_displayorder <- dat_displayorder %>%
-    separate(md_DO, into = paste0("c", 1:n_shown))
+    separate(md_DO, into = paste0("c", 1:n_shown), sep = "\\|")
 
   # number of each attributes showing up
   dat_displayorder <- dat_displayorder %>%
@@ -150,7 +159,16 @@ check_displaymatrix <- function(md_define = NULL) {
       cols = matches("^c\\d+"),
       names_to = "option_order",
       values_to = "attribute"
-    ) %>%
+    )
+
+  # in case of text
+  dat_displayorder$attribute <- type.convert(dat_displayorder$attribute, as.is = TRUE)
+  if(is.character(dat_displayorder$attribute)){
+    dat_displayorder <- dat_displayorder %>%
+      mutate(attribute = as.integer(factor(attribute, dat_attribute, 1:14)))
+  }
+
+  dat_displayorder <- dat_displayorder %>%
     count(attribute, name = "n") %>%
     mutate(attribute = as.integer(attribute)) %>%
     arrange(attribute)
@@ -180,6 +198,7 @@ process_maxdiff_question_format <- function(md_define = NULL, signchange = FALSE
   n_attributes <- md_define$n$attributes
   n_shown <- md_define$n$shown
   dat <- md_define$data$raw
+  dat_attribute <- md_define$attributes
 
   # column names
   dat_maxdiff <- dat %>%
@@ -215,7 +234,15 @@ process_maxdiff_question_format <- function(md_define = NULL, signchange = FALSE
       cols = starts_with("c__"),
       names_to = "choice_order",
       values_to = "choice_attribute"
-    ) %>%
+    )
+  # text csv
+  dat_DO$choice_attribute <- type.convert(dat_DO$choice_attribute, as.is = TRUE)
+  if(is.character(dat_DO$choice_attribute)){
+    dat_DO <- dat_DO %>%
+      mutate(choice_attribute = factor(choice_attribute, dat_attribute, 1:n_attributes))
+  }
+
+  dat_DO <- dat_DO %>%
     mutate(attribute = choice_attribute) %>%
     # convert design matrix back to a wide format: a__ for attribute
     mutate(dummy = 1L) %>%
@@ -245,7 +272,7 @@ process_maxdiff_question_format <- function(md_define = NULL, signchange = FALSE
 
   # combine choice and attribute matrix
   dat_maxdiff <- dat_choice %>%
-    left_join(dat_DO, by = c("ResponseId", "trial", "trial_attribute")) %>%
+    left_join(dat_DO, by = c("ResponseId", "trial", "trial_attribute"), relationship = "many-to-many") %>%
     mutate(chosen = as.integer(attribute == chosen_attribute))
 
   rm(dat_DO, dat_choice)

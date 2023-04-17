@@ -156,6 +156,10 @@ read_qualtrics_header <- function(md_define = NULL, n_word_match = 10) {
       ))
   }
 
+  # for "text" csv output
+  dat_header <- dat_header %>%
+    mutate(text = str_replace(text, "R\\d+[[:space:]]-[[:space:]]", ""))
+
   # convert options to number
   dat_header <- dat_header %>%
     mutate(id = as.integer(fct_inorder(factor(text))))
