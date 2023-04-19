@@ -148,17 +148,41 @@ read_qualtrics_header <- function(md_define = NULL, n_word_match = 10) {
   }
 
   # extract attributes
+  # for (i in unique(question$q_text)) {
+  #   dat_header <- dat_header %>%
+  #     mutate(text = sub(
+  #       pattern = i, replacement = "",
+  #       x = dat_header$describe, fixed = TRUE
+  #     ))
+  # }
   for (i in unique(question$q_text)) {
     dat_header <- dat_header %>%
-      mutate(text = sub(
-        pattern = i, replacement = "",
-        x = dat_header$describe, fixed = TRUE
-      ))
+      mutate(text = str_replace(describe, fixed(i), ""))
   }
 
-  # for "text" csv output
+  # for "text" csv output / loop and merge
   dat_header <- dat_header %>%
-    mutate(text = str_replace(text, "R\\d+[[:space:]]-[[:space:]]", ""))
+    mutate(prefix = str_extract(text, "^.+[[:space:]]-[[:space:]]"))
+
+  # assume more than 4 attributes in MaxDiff
+  dat_prefix <- dat_header %>%
+    filter(!is.na(prefix)) %>%
+    count(prefix, name = "n") %>%
+    filter(n > 4)
+
+  # extract attributes
+  # for (i in unique(dat_prefix$prefix)) {
+  #   dat_header <- dat_header %>%
+  #     mutate(text = sub(
+  #       pattern = i, replacement = "",
+  #       x = dat_header$text, fixed = TRUE
+  #     ))
+  # }
+  dat_header <- dat_header %>%
+    mutate(prefix_replace = if_else(prefix %in% dat_prefix$prefix,
+                                    TRUE, FALSE, NA)) %>%
+    mutate(text = if_else(prefix_replace, str_replace(text, fixed(prefix), ""), text, NA_character_)) %>%
+    select(-prefix, -prefix_replace)
 
   # convert options to number
   dat_header <- dat_header %>%
