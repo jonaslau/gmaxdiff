@@ -164,11 +164,16 @@ read_qualtrics_header <- function(md_define = NULL, n_word_match = 10) {
   dat_header <- dat_header %>%
     mutate(prefix = str_extract(text, "^.+[[:space:]]-[[:space:]]"))
 
+  # number of DO rows
+  n_DO = dat_header %>%
+    filter(str_detect(str_trim(text), fixed("Display Order"))) %>%
+    nrow()
+
   # assume more than 4 attributes in MaxDiff
   dat_prefix <- dat_header %>%
     filter(!is.na(prefix)) %>%
     count(prefix, name = "n") %>%
-    filter(n > 4)
+    filter(n >= (nrow(dat_header) - n_DO)/n_DO)
 
   # extract attributes
   # for (i in unique(dat_prefix$prefix)) {
