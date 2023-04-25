@@ -28,7 +28,8 @@ Note on Qualtrics data:
 - Here we import the simulated ice cream data set as illustration
 ```{r}
 library(tidyverse)
-file_path <- system.file("extdata", "sample_data.csv", package = "gmaxdiff")
+
+file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
 md_define <- read_qualtrics_data(file_path)
 ```
 
