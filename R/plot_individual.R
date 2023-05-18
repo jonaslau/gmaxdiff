@@ -5,7 +5,14 @@
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' plot_individual_prct(md_define)
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+#' md_define <- process_bayesm_format(md_define = md_define)
+#' md_define <- run_bayesm_simulation(md_define, R = 2e3)
+#' md_define <- process_individual_prct(md_define)
 process_individual_prct <- function(md_define = NULL, burn_in = .5) {
   # save to md_define
   if (is.null(md_define)) {
@@ -54,8 +61,16 @@ process_individual_prct <- function(md_define = NULL, burn_in = .5) {
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' plot_attribute_distribution(md_define)
-plot_attribute_distribution <- function(md_define, label_width = 30, ncol = 2) {
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+#' md_define <- process_bayesm_format(md_define = md_define)
+#' md_define <- run_bayesm_simulation(md_define, R = 2e3)
+#' md_define <- process_individual_prct(md_define)
+#' md_define <- plot_attribute_distribution(md_define)
+plot_attribute_distribution <- function(md_define = NULL, label_width = 30, ncol = 2) {
   google_color <- c("#4285F4", "#DB4437", "#F4B400", "#0F9D58")
 
   dat_plot <- md_define$results$individual_prct

@@ -18,5 +18,7 @@ A list containing the data and processed data
 Process Qualtrics dataset headers
 }
 \examples{
-read_qualtrics_header(md_define = md_define)
+file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+md_define <- read_qualtrics_data(file_path)
+md_define <- read_qualtrics_header(md_define = md_define)
 }

@@ -6,7 +6,14 @@
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' process_group_prct(md_define, group_var = "Q4")
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+#' md_define <- process_bayesm_format(md_define = md_define)
+#' md_define <- run_bayesm_simulation(md_define, R = 2e3)
+#' md_define <- process_group_prct(md_define, group_var = "Q18")
 process_group_prct <- function(md_define = NULL, group_var = NULL, burn_in = .5) {
   # save to md_define
   if (is.null(md_define)) {
@@ -118,7 +125,16 @@ process_group_prct <- function(md_define = NULL, group_var = NULL, burn_in = .5)
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' plot_group_prct(md_define, label_width = 30, include = c("Female", "Male", "Unspecified"))
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+#' md_define <- process_bayesm_format(md_define = md_define)
+#' md_define <- run_bayesm_simulation(md_define, R = 2e3)
+#' md_define <- process_aggregate_prct(md_define = md_define)
+#' md_define <- process_group_prct(md_define, group_var = "Q18")
+#' md_define <- plot_group_prct(md_define, label_width = 30, include = c(1,2))
 plot_group_prct <- function(md_define, label_width = 30, include = NULL) {
   google_color <- c("#4285F4", "#DB4437", "#F4B400", "#0F9D58")
 

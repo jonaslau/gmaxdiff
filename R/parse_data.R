@@ -4,7 +4,10 @@
 #' @export
 #' @returns A list containing the data and processed data
 #' @examples
-#' process_attribute_text = function(md_define)
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
 process_attribute_text = function(md_define = NULL){
   # check number of attributes at the end
   n_attributes = 0
@@ -187,7 +190,11 @@ check_displaymatrix <- function(md_define = NULL) {
 #' @import tidyr
 #' @export
 #' @examples
-#' process_maxdiff_format(md_define, signchange = FALSE)
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
 process_maxdiff_question_format <- function(md_define = NULL, signchange = FALSE) {
   # save to md_define
   if (is.null(md_define)) {
@@ -333,7 +340,9 @@ process_maxdiff_question_format <- function(md_define = NULL, signchange = FALSE
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' process_maxdiff_module_format(md_define, signchange = FALSE)
+#' file_path <- system.file("extdata", "sixfeatures.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- process_maxdiff_module_format(md_define, signchange = FALSE)
 process_maxdiff_module_format <- function(md_define = NULL, signchange = FALSE) {
   # save to md_define
   if (is.null(md_define)) {

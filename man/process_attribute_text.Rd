@@ -16,5 +16,8 @@ A list containing the data and processed data
 Format headers of data file
 }
 \examples{
-process_attribute_text = function(md_define)
+file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+md_define <- read_qualtrics_data(file_path)
+md_define <- read_qualtrics_header(md_define = md_define)
+md_define <- process_attribute_text(md_define = md_define)
 }

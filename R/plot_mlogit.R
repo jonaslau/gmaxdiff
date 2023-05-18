@@ -6,7 +6,12 @@
 #' @import dfidx
 #' @export
 #' @examples
-#' run_mlogit(md_define)
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+#' md_define <- run_mlogit(md_define)
 run_mlogit <- function(md_define) {
   dat_maxdiff <- md_define$data$maxdiff
   n_attributes <- md_define$n$attributes
@@ -50,7 +55,13 @@ run_mlogit <- function(md_define) {
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' plot_mlogit_betas(md_define, label_width = 30, point_color = c("red", "blue"))
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+#' md_define <- run_mlogit(md_define)
+#' md_define <- plot_mlogit_betas(md_define, label_width = 30, point_color = c("red", "blue"))
 plot_mlogit_betas <- function(md_define, label_width = 30, point_color = NULL) {
   google_color <- c("#4285F4", "#DB4437", "#F4B400", "#0F9D58")
 

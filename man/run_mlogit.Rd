@@ -16,5 +16,10 @@ A list containing the data and processed data
 Wrapper for \code{mlogit} for data checking
 }
 \examples{
-run_mlogit(md_define)
+file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+md_define <- read_qualtrics_data(file_path)
+md_define <- read_qualtrics_header(md_define = md_define)
+md_define <- process_attribute_text(md_define = md_define)
+md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+md_define <- run_mlogit(md_define)
 }

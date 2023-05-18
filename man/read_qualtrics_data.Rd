@@ -20,5 +20,6 @@ A list containing the data and processed data
 Read in a csv file
 }
 \examples{
-read_qualtrics_data(file_name = "data.csv", folder = "/project/", md_define = md_define)
+file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+md_define <- read_qualtrics_data(file_path)
 }

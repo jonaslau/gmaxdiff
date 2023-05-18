@@ -8,7 +8,8 @@
 #' @import stringr
 #' @export
 #' @examples
-#' read_qualtrics_data(file_name = "data.csv", folder = "/project/", md_define = md_define)
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
 read_qualtrics_data <- function(file_name = NULL, folder = NULL, md_define = NULL) {
   # change directory
   if (!is.null(folder)) setwd(folder)
@@ -70,7 +71,9 @@ read_qualtrics_data <- function(file_name = NULL, folder = NULL, md_define = NUL
 #' @import dplyr
 #' @import forcats
 #' @examples
-#' read_qualtrics_header(md_define = md_define)
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
 read_qualtrics_header <- function(md_define = NULL, n_word_match = 10) {
   # save to md_define
   if (is.null(md_define)) {

@@ -5,9 +5,16 @@
 #' @param keep An integer. Keeping every `keep`-th draw. Default: keeping 2000 draws.
 #' @param seed An integer. Provide a seed for results reproduction
 #' @returns A list containing the data and processed data
+#' @import dplyr
 #' @export
 #' @examples
-#' run_bayesm_simulation(md_define, R = 1e4, keep = 10, seed = NULL)
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+#' md_define <- process_bayesm_format(md_define = md_define)
+#' md_define <- run_bayesm_simulation(md_define, R = 5e2)
 run_bayesm_simulation <- function(md_define = md_define, R = 1e4, keep = 10, seed = NA_integer_) {
 
   # set seed
@@ -47,7 +54,14 @@ run_bayesm_simulation <- function(md_define = md_define, R = 1e4, keep = 10, see
 #' @returns A list containing the data and processed data
 #' @export
 #' @examples
-#' plot_trace(md_define)
+#' file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+#' md_define <- read_qualtrics_data(file_path)
+#' md_define <- read_qualtrics_header(md_define = md_define)
+#' md_define <- process_attribute_text(md_define = md_define)
+#' md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+#' md_define <- process_bayesm_format(md_define = md_define)
+#' md_define <- run_bayesm_simulation(md_define, R = 5e2)
+#' md_define <- plot_trace(md_define)
 plot_trace <- function(md_define = NULL, label_width = 30) {
   # save to md_define
   if (is.null(md_define)) {

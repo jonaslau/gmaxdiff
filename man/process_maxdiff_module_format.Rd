@@ -18,5 +18,7 @@ A list containing the data and processed data
 Parse maxdiff module format data (instead of maxdiff question format)
 }
 \examples{
-process_maxdiff_module_format(md_define, signchange = FALSE)
+file_path <- system.file("extdata", "sixfeatures.csv", package = "gmaxdiff")
+md_define <- read_qualtrics_data(file_path)
+md_define <- process_maxdiff_module_format(md_define, signchange = FALSE)
 }

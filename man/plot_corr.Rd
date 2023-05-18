@@ -18,5 +18,14 @@ A list containing the data and processed data
 plot attribute correlations
 }
 \examples{
+file_path <- system.file("extdata", "icecream.csv", package = "gmaxdiff")
+md_define <- read_qualtrics_data(file_path)
+md_define <- read_qualtrics_header(md_define = md_define)
+md_define <- process_attribute_text(md_define = md_define)
+md_define <- process_maxdiff_question_format(md_define = md_define, signchange = FALSE)
+md_define <- process_bayesm_format(md_define = md_define)
+md_define <- run_bayesm_simulation(md_define, R = 5e2)
+md_define <- process_aggregate_betas(md_define = md_define)
+md_define <- process_corr(md_define)
 plot_corr(md_define, n_clusters = 3)
 }
